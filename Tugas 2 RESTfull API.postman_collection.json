@@ -1,0 +1,347 @@
+{
+  "info": {
+    "_postman_id": "a9bdafee-bf43-446b-ade5-b2c8efe412a1",
+    "name": "Tugas 2 RESTfull API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "58487127",
+    "_collection_link": "https://go.postman.co/collection/58487127-a9bdafee-bf43-446b-ade5-b2c8efe412a1?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "A. CRUD",
+      "item": [
+        {
+          "name": "Semua Toddler",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "\r\npm.test('Status code adalah 200', function () {\r\n  pm.response.to.have.status(200);\r\n});\r\n\r\npm.test('Response berupa array', function () {\r\n  const jsonData = pm.response.json();\r\n  pm.expect(jsonData).to.be.an('array');\r\n});\r\n\r\npm.test('Setiap data memiliki id dan nama', function () {\r\n  const jsonData = pm.response.json();\r\n  jsonData.forEach((item) => {\r\n    pm.expect(item).to.have.property('id');\r\n    pm.expect(item).to.have.property('nama');\r\n  });\r\n});\r\n\r\npm.test('Response time di bawah 500ms', function () {\r\n  pm.expect(pm.response.responseTime).to.be.below(500);\r\n});\r\n\r\npm.test('Data toddler pertama bernama Alya', function () {\r\n  const jsonData = pm.response.json();\r\n  pm.expect(jsonData[0].nama).to.eql('Alya');\r\n});\r\n"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/toddler",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "toddler"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Tambah Toddler",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code adalah 201', function () {\r\n  pm.response.to.have.status(201);\r\n});\r\n\r\npm.test('Data baru memiliki id dan nama sesuai kiriman', function () {\r\n  const jsonData = pm.response.json();\r\n  pm.expect(jsonData).to.have.property('id');\r\n  pm.expect(jsonData.nama).to.eql('Nadia');\r\n});\r\n\r\nif (pm.response.code === 201) {\r\n  pm.environment.set('toddlerId', pm.response.json().id);\r\n}\r\n"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-api-key",
+                "value": "{{x-api-key}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"nama\": \"Nadia\",\r\n  \"tanggalLahir\": \"2023-04-15\",\r\n  \"jenisKelamin\": \"P\",\r\n  \"beratKg\": 11,\r\n  \"tinggiCm\": 82\r\n}\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/toddler",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "toddler"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Satu Toddler",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code adalah 200', function () {\r\n  pm.response.to.have.status(200);\r\n});\r\n\r\npm.test('Data yang diambil adalah Nadia', function () {\r\n  const jsonData = pm.response.json();\r\n  pm.expect(jsonData.id).to.eql(Number(pm.environment.get('toddlerId')));\r\n  pm.expect(jsonData.nama).to.eql('Nadia');\r\n});\r\n"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/toddler/{{toddlerId}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "toddler",
+                "{{toddlerId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Ubah Toddler",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code adalah 200', function () {\r\n  pm.response.to.have.status(200);\r\n});\r\n\r\npm.test('Berat berubah, nama tetap', function () {\r\n  const jsonData = pm.response.json();\r\n  pm.expect(jsonData.beratKg).to.eql(12);\r\n  pm.expect(jsonData.nama).to.eql('Nadia');\r\n});\r\n"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "x-api-key",
+                "value": "{{x-api-key}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"beratKg\": 12 }\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/toddler/{{toddlerId}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "toddler",
+                "{{toddlerId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Hapus Toddler",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code adalah 204', function () {\r\n  pm.response.to.have.status(204);\r\n});\r\n\r\npm.test('Response tidak memiliki isi', function () {\r\n  pm.expect(pm.response.text()).to.eql('');\r\n});\r\n"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "x-api-key",
+                "value": "{{x-api-key}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/toddler/{{toddlerId}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "toddler",
+                "{{toddlerId}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "B. Skenario Gagal",
+      "item": [
+        {
+          "name": "ID sudah di hapus",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code adalah 404', function () {\r\n  pm.response.to.have.status(404);\r\n});\r\n\r\npm.test('Pesan error: Data tidak ditemukan', function () {\r\n  pm.expect(pm.response.json().message).to.eql('Data tidak ditemukan');\r\n});\r\n"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/toddler/{{toddlerId}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "toddler",
+                "{{toddlerId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Tanpa API key",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code adalah 401', function () {\r\n  pm.response.to.have.status(401);\r\n});\r\n\r\npm.test('Pesan error: API key tidak valid', function () {\r\n  pm.expect(pm.response.json().message).to.eql('API key tidak valid');\r\n});\r\n"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"nama\": \"Tanpa API Key\",\r\n  \"tanggalLahir\": \"2023-04-15\",\r\n  \"jenisKelamin\": \"P\",\r\n  \"beratKg\": 11,\r\n  \"tinggiCm\": 82\r\n}\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/toddler",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "toddler"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Data Tidak Lengkap",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code adalah 400', function () {\r\n    pm.response.to.have.status(400);\r\n});\r\n\r\npm.test('Pesan error menyebut field wajib', function () {\r\n    pm.expect(pm.response.json().message).to.include('wajib diisi');\r\n});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-api-key",
+                "value": "{{x-api-key}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"nama\": \"Hanya Nama\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/toddler",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "toddler"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "JSON Rusak",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code adalah 400', function () {\r\n    pm.response.to.have.status(400);\r\n});\r\n\r\npm.test('Respons tetap berupa JSON, bukan HTML', function () {\r\n    pm.response.to.be.json;\r\n    pm.expect(pm.response.json().message).to.eql('Format JSON tidak valid');\r\n});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-api-key",
+                "value": "{{x-api-key}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"nama\": \"Rusak\",}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/toddler",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "toddler"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

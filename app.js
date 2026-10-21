@@ -2,10 +2,38 @@ const express = require('express');
 const app = express();
 const PORT = 3000;
 
-// Middleware agar req.body (JSON) dapat dibaca
-app.use(express.json());
+app.use(express.json({
+    strict: true
+}));
 
-// Data sementara (disimpan di memori, hilang saat server restart)
+app.use((err, req, res, next) => {
+    if (err instanceof SyntaxError && err.status === 400 && 'body' in err) {
+        return res.status(400).json({
+            message: 'Format JSON tidak valid'
+        });
+    }
+
+    next(err);
+});
+
+
+// API Key
+const API_KEY = 'si5b_rahasia123';
+
+// Middleware untuk memeriksa API Key
+function cekApiKey(req, res, next) {
+  const apiKey = req.headers['x-api-key'];
+
+  if (apiKey !== API_KEY) {
+    return res.status(401).json({
+      message: 'API key tidak valid'
+    });
+  }
+
+  next();
+}
+
+// Data sementara (hilang saat server restart)
 let toddler = [
   {
     id: 1,
@@ -48,7 +76,7 @@ app.get('/toddler', (req, res) => {
   res.json(toddler);
 });
 
-// GET /toddler/:id -> satu data berdasarkan id
+// GET /toddler/:id -> satu data berdasarkan ID
 app.get('/toddler/:id', (req, res) => {
   const id = parseInt(req.params.id);
 
@@ -64,7 +92,8 @@ app.get('/toddler/:id', (req, res) => {
 });
 
 // POST /toddler -> tambah data baru
-app.post('/toddler', (req, res) => {
+// Wajib menggunakan API Key
+app.post('/toddler', cekApiKey, (req, res) => {
   const {
     nama,
     tanggalLahir,
@@ -77,8 +106,12 @@ app.post('/toddler', (req, res) => {
     !nama ||
     !tanggalLahir ||
     !jenisKelamin ||
-    !beratKg ||
-    !tinggiCm
+    beratKg === undefined ||
+    beratKg === null ||
+    beratKg === '' ||
+    tinggiCm === undefined ||
+    tinggiCm === null ||
+    tinggiCm === ''
   ) {
     return res.status(400).json({
       message:
